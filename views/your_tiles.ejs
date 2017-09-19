@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+  <head>
+
+    <% include partials/head %>
+
+  </head>
+  <body>
+    
+    <% include partials/header %>
+      
+    <div class="container">
+      <h3>Added by You</h3>
+      
+      <button id="add_new_tile_btn" class="w3-button w3-blue w3-hover-light-gray standard-button">Add Frame</button>
+    
+      <div id="new_tile_modal" class="w3-modal w3-animate-opacity">
+        <div class="w3-modal-content w3-card-4 add-new-tile-modal">
+          <header class="w3-container w3-light-gray"> 
+            <span onclick="document.getElementById('new_tile_modal').style.display='none'" 
+            class="w3-button w3-large w3-display-topright">&times;</span>
+            <h3>Add New Frame</h3>
+          </header>
+          <div class="w3-container">
+            <br>
+            
+            <div class="w3-row-padding">
+              <img hidden id="hidden-img-for-modal"></img>
+              <div class="tile_preview"></div>
+              <form>
+                <p>      
+                <label class="w3-text-blue"><b>Title</b></label>
+                <input id="tile_title" class="w3-input w3-border" type="text" placeholder="title" name="tile_title" required></p>
+                <p>      
+                <label class="w3-text-blue"><b>Frame Url</b></label>
+                <input id="tile_url" class="w3-input w3-border" type="text" placeholder="http..." name="tile_url" required></p>
+                <input type="submit" id="book_search_btn" class="w3-button w3-blue w3-border w3-right standard-button" value="Add"></input>
+              </form>
+            </div>
+
+            <br>
+          </div>
+        </div>
+      </div>
+      <div class="tile_grid">
+        <% for( var i = 0; i < tiles.length; i++ ) {%>
+            <div class="one_tile">
+              <img class="image_holder" src=<%= tiles[i].source %> ></img>
+              <span class="one_tile_title"><%= tiles[i].title %></span><br>
+              <span class="one_tile_like"><i class="fa fa-heart-o" aria-hidden="true"></i> <%= tiles[i].liked_by.length %></span><i  data-tile-id="<%= tiles[i]._id %>" class="fa fa-times w3-right one_tile_delete" aria-hidden="true"></i><br>
+            </div>
+        <% } %>
+        
+        
+        
+      </div>
+
+    </div>
+    
+    <% include partials/footer %>
+    
+  </body>
+  <script>
+    $(function(){
+      
+      var tile_img_url = "";
+      
+      $('#add_new_tile_btn').on('click', function(e){
+        $( "#tile_title" ).val('');
+        $( "#tile_url" ).val('');
+        $( ".tile_preview" ).css('background-image', 'none');
+        document.getElementById('new_tile_modal').style.display='block';
+      });
+      
+      $('#tile_url').on('input', function() { 
+         $( "#hidden-img-for-modal" ).attr( "src", $(this).val() );
+         $( ".tile_preview" ).css('background-image', 'url(' + $(this).val() + ')');
+         tile_img_url = $(this).val();
+      });
+      
+      $( "#hidden-img-for-modal" ).on('error', function() {
+        $( ".tile_preview" ).css('background-image', 'url(https://www.fillmurray.com/460/300)');
+        tile_img_url = "https://www.fillmurray.com/460/300";
+      });
+      
+      $('form').on('submit', function(e){
+        e.preventDefault();
+        
+        $.post('/new_tile',
+        {
+          tile_title: $( "#tile_title" ).val(),
+          tile_url: tile_img_url
+        },
+        function(data, status){
+          document.getElementById('new_tile_modal').style.display='none';
+          render_my_tiles(data);
+          $grid.masonry('destroy');
+          $grid.masonry( masonryOptions );
+        });
+      });
+      
+      function render_my_tiles(tiles){
+        var for_render = "";
+        for( var i = 0; i < tiles.data.length; i++ ) {
+          for_render += "<div class='one_tile'><img class='image_holder' src=" + tiles.data[i].source + "></img><span class='one_tile_title'>" +  tiles.data[i].title + "</span><br><span class='one_tile_like'><i class='fa fa-heart-o' aria-hidden='true'></i> " +  tiles.data[i].liked_by.length + "</span><i  data-tile-id=" + tiles.data[i]._id + " class='fa fa-times w3-right one_tile_delete' aria-hidden='true'></i><br></div>";
+        }
+        $('.tile_grid').html(for_render);
+      }
+      
+      $( '.tile_grid' ).on('click', '.one_tile_delete', function(e){
+        e.preventDefault();
+        
+        $.post('/delete_tile',
+        {
+          tile_id: $( this ).attr( "data-tile-id" )
+        },
+        function(data, status){
+          if(data.deleted){
+            $( this ).parents(".one_tile").remove();
+          }
+          $grid.masonry();
+        }.bind(this));
+      });
+      
+      //-----Masonry.js-----
+      var masonryOptions = {
+        columnWidth: '.one_tile',
+        itemSelector: '.one_tile'
+      };
+      var $grid = $(".tile_grid").masonry( masonryOptions );
+        
+
+
+    });
+  </script>
+</html>

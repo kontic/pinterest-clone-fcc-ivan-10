@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+
+    <% include partials/head %>
+
+  </head>
+  <body>
+    
+    <% include partials/header %>
+      
+    <div class="container">
+      <form class="w3-container" action="" method="post">
+        <% if(locals.message == 'Incorrect username.' || locals.message == 'Incorrect password.') { %>
+          <div class="w3-panel w3-pale-yellow w3-border w3-border-yellow">
+            <p><%= message %></p>
+          </div>
+        <% } %>
+        <p>      
+        <label class="w3-text-white"><b>Username</b></label>
+        <input class="w3-input w3-border w3-white" type="text" name="username" placeholder="Username" <% if(locals.username) { %>value=<%= username %> <% } %> ></p>
+        <p>      
+        <label class="w3-text-white"><b>Password</b></label>
+        <input class="w3-input w3-border w3-white" type="password" name="password" placeholder="Password" <% if(locals.password) { %>value=<%= password %> <% } %> >
+        <p>
+        <button class="w3-btn w3-blue log-btn standard-button">Login</button></p>
+      </form>
+      <div class="w3-container">
+        <a href="/auth/twitter"><button class="w3-btn w3-blue log-btn twitter-button">twitter</button></a>
+      </div>
+    </div>
+    
+    <% include partials/footer %>
+
+  </body>
+</html>

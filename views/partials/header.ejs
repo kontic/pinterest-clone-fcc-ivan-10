@@ -1,0 +1,19 @@
+<div class="w3-top w3-blue">
+  <div class="container">
+    <div class="w3-bar">
+      <a href="/" id="brand-name" class="w3-bar-item">Hidden Frame app</a>
+      <% if(!isAuthenticated) { %>
+        <a href="/signup" class="w3-bar-item w3-button w3-padding-16 w3-right w3-hover-light-gray">Sign Up</a>
+        <a href="/login" class="w3-bar-item w3-button w3-padding-16 w3-right w3-hover-light-gray">Login</a>
+      <% } else { %>
+        <a href="/your_tiles" class="w3-bar-item w3-button w3-padding-16 w3-hover-light-gray">Your Tiles</a>
+        <a href="/logout" class="w3-bar-item w3-button w3-padding-16 w3-right w3-hover-light-gray">Log Out</a>
+        <span id="greeting" class="w3-bar-item w3-right">Hello, <%= user.name %></span>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+
+
+       

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+  <head>
+
+    <% include partials/head %>
+
+  </head>
+  <body>
+    
+    <% include partials/header %>
+      
+    <div class="container">
+      <h3>Find hidden things in frames of movies and post them here.</h3>
+      
+
+      
+      <div class="tile_grid">
+        <% for( var i = 0; i < tiles.length; i++ ) {%>
+            <div class="one_tile">
+              <img class="image_holder" src=<%= tiles[i].source %> ></img>
+              <span class="one_tile_title"><%= tiles[i].title %></span><br>
+              <% if(isAuthenticated) { %>
+                <% if(tiles[i].added_by !== user.name) { %> 
+                  <span class="one_tile_like one_tile_like_vote" data-tile-id="<%= tiles[i]._id %>"><i class="fa fa-heart" aria-hidden="true"></i> <%= tiles[i].liked_by.length %></span><br>
+                <% } else { %>
+                  <span class="one_tile_like"><i class="fa fa-heart-o" aria-hidden="true"></i></i> <%= tiles[i].liked_by.length %></span><br>
+                <% } %>
+              <% } else { %>
+                <span class="one_tile_like"><i class="fa fa-heart-o" aria-hidden="true"></i></i> <%= tiles[i].liked_by.length %></span><br>
+              <% } %>
+              <% if(isAuthenticated) { %>
+                <% if(tiles[i].added_by === user.name) { %> 
+                  <span class="one_tile_author">You</span>
+                <% }else { %>
+                  <span class="one_tile_author"><%= tiles[i].added_by %></span>
+                <% } %>
+              <% } else { %>
+                <span class="one_tile_author"><%= tiles[i].added_by %></span>
+              <% } %>
+            </div>
+        <% } %>
+        
+        
+        
+      </div>
+      
+    </div>
+    
+    <% include partials/footer %>
+    
+  </body>
+  <script>
+    $(function(){
+      
+
+
+      $('.one_tile_like_vote').on('click', function(e){
+        e.preventDefault();
+        
+        $.post('/vote_for_tile',
+        {
+          tile_id: $( this ).attr( "data-tile-id" )
+        },
+        function(data, status){
+          var for_render = "<i class='fa fa-heart' aria-hidden='true'></i> " + data.changed_tile.liked_by.length;
+          $( this ).html(for_render);
+        }.bind(this));
+      });
+      
+
+      
+      //-----Masonry.js-----
+      $(".tile_grid").masonry({
+        columnWidth: '.one_tile',
+        itemSelector: '.one_tile'
+      });
+
+      
+      
+    });
+  </script>
+</html>
